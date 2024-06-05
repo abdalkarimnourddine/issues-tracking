@@ -21,8 +21,20 @@ type IssueFrom =z.infer<typeof createIssueSchema>;
 const NewIssuePage = () => {
   const [error,setError] = useState('');
   const [isSubmitting,setSubmitting]=useState(false);
-  const router= useRouter();
   const {register,control,handleSubmit,formState:{errors}} =useForm<IssueFrom>({resolver:zodResolver(createIssueSchema)});
+  const onSubmit = handleSubmit(
+    async (data) => {
+    try {
+       setSubmitting(true);
+       await axios.post('/api/issues/',data);   
+       await router.push('/issues');   
+    } catch (error) {
+     setSubmitting(false);
+       setError('An excepted error occured');
+   }
+    });
+  const router= useRouter();
+  
   return (
        <div className='max-w-xl space-y-3'>
         {error && (
@@ -31,19 +43,7 @@ const NewIssuePage = () => {
             {error}  
         </Callout.Text>
       </Callout.Root>)}
-         <form className=' space-y-3' onSubmit={handleSubmit(
-         async (data) => {
-         try {
-            setSubmitting(true);
-            await axios.post('/api/issues/',data);   
-            await router.push('/issues');   
-         } catch (error) {
-          setSubmitting(false);
-            setError('An excepted error occured');
-            console.log(error);
-             
-        }
-         })}>
+         <form className=' space-y-3' onSubmit={onSubmit}>
           <TextField.Root placeholder="title" {...register('title')}/>
           <ErrorMessage>{errors.title?.message}</ErrorMessage>
           <Controller
