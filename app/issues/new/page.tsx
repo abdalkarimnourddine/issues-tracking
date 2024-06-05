@@ -11,6 +11,7 @@ import { Resolver } from 'dns';
 import { createIssueSchema } from '@/app/validationSchemas';
 import { z } from 'zod';
 import ErrorMessage from '@/app/components/ErrorMessage';
+import Spinner from '@/app/components/Spinner';
 
 // interface IssueFrom{
 //     title:string,
@@ -19,6 +20,7 @@ import ErrorMessage from '@/app/components/ErrorMessage';
 type IssueFrom =z.infer<typeof createIssueSchema>;
 const NewIssuePage = () => {
   const [error,setError] = useState('');
+  const [isSubmitting,setSubmitting]=useState(false);
   const router= useRouter();
   const {register,control,handleSubmit,formState:{errors}} =useForm<IssueFrom>({resolver:zodResolver(createIssueSchema)});
   return (
@@ -32,9 +34,11 @@ const NewIssuePage = () => {
          <form className=' space-y-3' onSubmit={handleSubmit(
          async (data) => {
          try {
+            setSubmitting(true);
             await axios.post('/api/issues/',data);   
             await router.push('/issues');   
          } catch (error) {
+          setSubmitting(false);
             setError('An excepted error occured');
             console.log(error);
              
@@ -48,7 +52,7 @@ const NewIssuePage = () => {
            render={({ field }) => <SimpleMDE placeholder="description" {...field} />}
            />
            <ErrorMessage>{errors.description?.message}</ErrorMessage>
-          <Button>Submit</Button>
+          <Button disabled={isSubmitting}>Submit {isSubmitting && (<Spinner/>)}</Button>
         </form>
         </div> 
   )
