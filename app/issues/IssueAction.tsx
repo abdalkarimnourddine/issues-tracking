@@ -4,7 +4,7 @@ import React from 'react'
 
 const IssueAction = () => {
   return (
-    <Button><Link href="/issues/new">New Issue</Link></Button>
+    <Button className='bg-orange-500'><Link href="/issues/new">New Issue</Link></Button>
   )
 }
 
